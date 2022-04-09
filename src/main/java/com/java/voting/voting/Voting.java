@@ -1,28 +1,33 @@
 package com.java.voting.voting;
 
-import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
+import com.java.voting.topic.Topic;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity @Table(name = "voting")
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder
 public class Voting {
 
-    public Voting (Long idTopic){
-        this.idTopic = idTopic;
+    public Voting (Topic topic){
+        this.topic = topic;
         this.positiveVotes = 0;
         this.negativeVotes = 0;
-        this.status = "voting";
-        this.startTime = LocalDateTime.now();
+        this.status = VotingStatus.OPEN;
     }
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_voting", nullable = false)
     private Long idVoting;
 
-    private Long idTopic;
+    @OneToOne
+    @JoinColumn(name = "id_topic", referencedColumnName = "id_topic")
+    private Topic topic;
 
     private Integer positiveVotes;
 
@@ -32,6 +37,7 @@ public class Voting {
 
     private LocalDateTime endTime;
 
-    private String status;
+    @Enumerated(EnumType.ORDINAL)
+    private VotingStatus status;
 
 }

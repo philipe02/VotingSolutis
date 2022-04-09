@@ -1,10 +1,16 @@
 package com.java.voting.vote;
 
+import com.java.voting.associate.Associate;
+import com.java.voting.associate.AssociateRepository;
+import com.java.voting.exception.VoteAlreadyRegistered;
+import com.java.voting.exception.VotingClosed;
 import com.java.voting.voting.Voting;
 import com.java.voting.voting.VotingRepository;
+import com.java.voting.voting.VotingStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -14,6 +20,8 @@ public class VoteService {
     VoteRepository repository;
     @Autowired
     VotingRepository votingRepository;
+    @Autowired
+    AssociateRepository associateRepository;
 
     public List<Vote> getAllVotes() {
         return repository.findAll();
@@ -21,18 +29,20 @@ public class VoteService {
 
     public Object saveVote(Vote vote) {
         Voting voting = votingRepository.findById(vote.getIdVoting()).orElseThrow();
+        Associate associate = associateRepository.findById(vote.getIdAssociate()).orElseThrow();
 
-        if (voting.getStatus().equals("closed"))
-            return "Voting is closed";
+        if(repository.existsByIdVotingAndIdAssociate(voting.getIdVoting(), associate.getIdAssociate()))
+           throw new VoteAlreadyRegistered("Vote for this topic already registered");
 
-        if(vote.getOption() != 1 && vote.getOption() != 2)
-            return "Invalid option";
+        if (voting.getStatus().equals(VotingStatus.CLOSED))
+            throw new VotingClosed("Voting is already closed");
 
-        if (vote.getOption() == 1)
+        if (vote.getInFavour())
             voting.setPositiveVotes(voting.getPositiveVotes() + 1);
-
-        if (vote.getOption() == 2)
+        else
             voting.setNegativeVotes(voting.getNegativeVotes() + 1);
+
+        vote.setVotingTime(LocalDateTime.now());
 
         votingRepository.save(voting);
 

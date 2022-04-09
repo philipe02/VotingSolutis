@@ -3,8 +3,12 @@ package com.java.voting.voting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/voting")
@@ -19,7 +23,12 @@ public class VotingController {
     }
 
     @PostMapping("/v1/{topic}")
-    public ResponseEntity<Voting> startVoting(@PathVariable("topic") Long idTopic, @RequestParam(name="duration", defaultValue = "60") Integer durationInSeconds){
-        return new ResponseEntity<Voting>(service.startVoting(idTopic, durationInSeconds), HttpStatus.CREATED);
+    public ResponseEntity<Object> createVoting(@PathVariable("topic") Long idTopic){
+        return new ResponseEntity<>(service.createVoting(idTopic), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/v1/start/{voting}")
+    public ResponseEntity<Object> startVoting(@PathVariable("voting") Long idVoting, @RequestParam(name="duration", defaultValue = "20") Integer durationInSeconds){
+        return new ResponseEntity<Object>(service.startVoting(idVoting, durationInSeconds), HttpStatus.OK);
     }
 }
