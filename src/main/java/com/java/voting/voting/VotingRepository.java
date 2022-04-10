@@ -1,12 +1,13 @@
 package com.java.voting.voting;
 
 import com.java.voting.topic.Topic;
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface VotingRepository extends JpaRepository<Voting, Long> {
 
@@ -21,4 +22,6 @@ public interface VotingRepository extends JpaRepository<Voting, Long> {
     void startVoting(Long idVoting, LocalDateTime startTime);
 
     boolean existsByTopic(Topic topic);
+
+    Optional<Voting> findByTopic(Topic topic);
 }

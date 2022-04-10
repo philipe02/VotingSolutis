@@ -1,7 +1,7 @@
 package com.java.voting.voting;
 
 import com.java.voting.topic.Topic;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

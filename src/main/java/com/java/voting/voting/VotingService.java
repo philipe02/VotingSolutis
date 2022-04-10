@@ -30,7 +30,7 @@ public class VotingService {
         return repository.save(new Voting(topic));
     }
 
-    public Object startVoting(Long idVoting, Integer durationInSeconds){
+    public String startVoting(Long idVoting, Integer durationInSeconds){
         Voting voting = repository.findById(idVoting).orElseThrow();
 
         if (voting.getStatus() != VotingStatus.OPEN)
