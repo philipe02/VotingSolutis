@@ -29,7 +29,7 @@ public class VotingController {
 
     @Operation(summary = "Start Voting section of specified id")
     @PostMapping("/v1/start/{votingId}")
-    public ResponseEntity<String> startVoting(@PathVariable("votingId") Long idVoting, @RequestParam(name="duration", defaultValue = "20") Integer durationInSeconds){
+    public ResponseEntity<String> startVoting(@PathVariable("votingId") Long idVoting, @RequestParam(name="duration", defaultValue = "60") Integer durationInSeconds){
         return new ResponseEntity<>(service.startVoting(idVoting, durationInSeconds), HttpStatus.OK);
     }
 }

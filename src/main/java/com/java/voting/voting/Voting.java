@@ -2,6 +2,8 @@ package com.java.voting.voting;
 
 import com.java.voting.topic.Topic;
 import javax.persistence.*;
+
+import com.java.voting.vote.Vote;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity @Table(name = "voting")
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder
@@ -40,4 +43,24 @@ public class Voting {
     @Enumerated(EnumType.ORDINAL)
     private VotingStatus status;
 
+    @Override
+    public boolean equals(Object o){
+        if(this == o) return true;
+        if(o == null || this.getClass() != o.getClass()) return false;
+
+        Voting vote = (Voting) o;
+
+        return Objects.equals(this.idVoting, vote.getIdVoting())
+                && Objects.equals(this.topic, vote.getTopic())
+                && Objects.equals(this.positiveVotes, vote.getPositiveVotes())
+                && Objects.equals(this.negativeVotes, vote.getNegativeVotes())
+                && Objects.equals(this.startTime, vote.getStartTime())
+                && Objects.equals(this.endTime, vote.getEndTime())
+                && Objects.equals(this.status, vote.getStatus());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idVoting, topic, positiveVotes, negativeVotes, startTime, endTime, status);
+    }
 }

@@ -1,13 +1,14 @@
 package com.java.voting.voting;
 
-import com.java.voting.exception.VotingAlreadyExists;
-import com.java.voting.exception.VotingClosed;
+import com.java.voting.exception.InvalidVotingStatusException;
+import com.java.voting.exception.VotingAlreadyExistsException;
 import com.java.voting.topic.Topic;
 import com.java.voting.topic.TopicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.logging.Logger;
 
 @Service
 public class VotingService {
@@ -25,7 +26,7 @@ public class VotingService {
         Topic topic = topicRepository.findById(idTopic).orElseThrow();
 
         if (repository.existsByTopic(topic))
-            throw new VotingAlreadyExists("Voting for this topic has already been created");
+            throw new VotingAlreadyExistsException("Voting for this topic has already been created");
 
         return repository.save(new Voting(topic));
     }
@@ -34,7 +35,7 @@ public class VotingService {
         Voting voting = repository.findById(idVoting).orElseThrow();
 
         if (voting.getStatus() != VotingStatus.OPEN)
-            throw new VotingClosed("Voting already " + (voting.getStatus() == VotingStatus.VOTING ? "iniciada" : "ocorreu"));
+            throw new InvalidVotingStatusException("Voting already " + (voting.getStatus() == VotingStatus.VOTING ? "iniciada" : "ocorreu"));
 
         repository.startVoting(voting.getIdVoting(), LocalDateTime.now());
         votingTimer(voting, durationInSeconds);
@@ -43,21 +44,13 @@ public class VotingService {
     }
 
     public void votingTimer(Voting voting, Integer seconds){
-        if (seconds == null) {
-            seconds = 60;
-        }
-        //Necessário para utilizar a variável na lambda function
-        Integer finalSeconds = seconds;
-
         new Thread(() -> {
-                System.out.println("Iniciando votação terminando em "+ finalSeconds + " segundos");
                 try{
-                    Thread.sleep(finalSeconds * 1000);
+                    Thread.sleep((long) seconds * 1000);
                     repository.closeVoting(voting.getIdVoting(), LocalDateTime.now());
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
                 }
-                System.out.println("Votação encerrada");
             }).start();
 
     }
