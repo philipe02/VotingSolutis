@@ -17,7 +17,7 @@ public class TopicController {
 
     @Operation(summary = "Return topic of specified id")
     @GetMapping("/v1/{id}")
-    public ResponseEntity<TopicViewModel> getTopicById(@PathVariable("id") Long id){
+    public ResponseEntity<TopicDTO> getTopicById(@PathVariable("id") Long id){
         return new ResponseEntity<>(service.getTopicById(id), HttpStatus.OK) ;
     }
 

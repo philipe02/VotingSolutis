@@ -19,13 +19,13 @@ public class VoteController {
 
     @Operation(summary = "Return a list with all votes registered")
     @GetMapping("/v1")
-    public ResponseEntity<List<Vote>> getAllVotes(){
+    public ResponseEntity<List<VoteDTO>> getAllVotes(){
         return new ResponseEntity<>(service.getAllVotes(), HttpStatus.OK);
     }
 
     @Operation(summary = "Register a vote from an associate to the informed voting section")
     @PostMapping("/v1")
-    public ResponseEntity<Vote> saveVote(@RequestBody Vote vote){
+    public ResponseEntity<Vote> saveVote(@RequestBody VoteViewModel vote){
         return new ResponseEntity<>(service.saveVote(vote), HttpStatus.CREATED);
     }
 }

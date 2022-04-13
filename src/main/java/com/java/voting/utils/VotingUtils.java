@@ -1,9 +1,44 @@
 package com.java.voting.utils;
 
+import com.java.voting.voting.Voting;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+@Component
 public class VotingUtils {
+    private static Clock clock;
+
+    @Autowired
+    public VotingUtils(Clock clock){
+        VotingUtils.clock = clock;
+    }
+
     private VotingUtils(){}
+
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss:SS");
 
     public static Double ratioCalculator(Double total, Double value){
         return (value/total)*100;
+    }
+
+    public static String getResult(Voting voting) {
+        if (voting.getPositiveVotes() > voting.getNegativeVotes())
+            return "In favour";
+        if (voting.getPositiveVotes().equals(voting.getNegativeVotes()))
+            return "Draw";
+        return "Against";
+    }
+
+    public static Boolean isVoteInTime(LocalDateTime startTime, LocalDateTime endTime){
+        return LocalDateTime.now(clock).isAfter(startTime) && LocalDateTime.now(clock).isBefore(endTime);
+    }
+
+    public static String dateTimeFormatter(LocalDateTime dateTime){
+        if(dateTime == null) return null;
+        return dateTime.format(dateTimeFormatter);
     }
 }

@@ -4,6 +4,7 @@ import com.java.voting.associate.Associate;
 import com.java.voting.associate.AssociateRepository;
 import com.java.voting.exception.VoteAlreadyRegisteredException;
 import com.java.voting.exception.VotingClosedException;
+import com.java.voting.utils.VotingUtils;
 import com.java.voting.voting.Voting;
 import com.java.voting.voting.VotingRepository;
 import com.java.voting.voting.VotingStatus;
@@ -18,37 +19,44 @@ import java.util.List;
 public class VoteService {
 
     @Autowired
-    VoteRepository repository;
-    @Autowired
     Clock clock;
+    @Autowired
+    VoteRepository repository;
     @Autowired
     VotingRepository votingRepository;
     @Autowired
     AssociateRepository associateRepository;
 
-    public List<Vote> getAllVotes() {
-        return repository.findAll();
+    public List<VoteDTO> getAllVotes() {
+        List<Vote> voteList = repository.findAll();
+        return voteList.stream().map(VoteDTO::createVoteDTO).toList();
     }
 
-    public Vote saveVote(Vote vote) {
-        Voting voting = votingRepository.findById(vote.getIdVoting()).orElseThrow();
-        Associate associate = associateRepository.findById(vote.getIdAssociate()).orElseThrow();
+    public Vote saveVote(VoteViewModel vote) {
+        Voting voting = votingRepository.findById(vote.idVoting()).orElseThrow();
+        Associate associate = associateRepository.findById(vote.idAssociate()).orElseThrow();
 
-        if(repository.existsByIdVotingAndIdAssociate(voting.getIdVoting(), associate.getIdAssociate()))
+        Vote voteToSave = Vote.builder()
+                .associate(associate)
+                .voting(voting)
+                .inFavour(vote.inFavour())
+                .build();
+
+        if(repository.existsByVotingAndAssociate(voting, associate))
            throw new VoteAlreadyRegisteredException("Vote for this topic already registered");
 
-        if (voting.getStatus().equals(VotingStatus.CLOSED))
+        if (!VotingUtils.isVoteInTime(voting.getStartTime(), voting.getEndTime()))
             throw new VotingClosedException("Voting is already closed");
 
-        if (vote.getInFavour())
+        if (voteToSave.getInFavour())
             voting.setPositiveVotes(voting.getPositiveVotes() + 1);
         else
             voting.setNegativeVotes(voting.getNegativeVotes() + 1);
 
-        vote.setVotingTime(LocalDateTime.now(clock));
+        voteToSave.setVotingTime(LocalDateTime.now(clock));
 
         votingRepository.save(voting);
 
-        return repository.save(vote);
+        return repository.save(voteToSave);
     }
 }

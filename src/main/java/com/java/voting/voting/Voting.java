@@ -1,15 +1,9 @@
 package com.java.voting.voting;
 
 import com.java.voting.topic.Topic;
+import lombok.*;
+
 import javax.persistence.*;
-
-import com.java.voting.vote.Vote;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
 

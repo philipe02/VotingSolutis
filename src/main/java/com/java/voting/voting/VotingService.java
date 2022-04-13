@@ -7,19 +7,21 @@ import com.java.voting.topic.TopicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.logging.Logger;
 
 @Service
 public class VotingService {
 
     @Autowired
+    Clock clock;
+    @Autowired
     VotingRepository repository;
     @Autowired
     TopicRepository topicRepository;
 
-    public Voting getVotingById(Long idVoting){
-        return repository.findById(idVoting).orElseThrow();
+    public VotingDTO getVotingById(Long idVoting){
+        return VotingDTO.createVotingDTO(repository.findById(idVoting).orElseThrow());
     }
 
     public Voting createVoting(Long idTopic){
@@ -35,23 +37,13 @@ public class VotingService {
         Voting voting = repository.findById(idVoting).orElseThrow();
 
         if (voting.getStatus() != VotingStatus.OPEN)
-            throw new InvalidVotingStatusException("Voting already " + (voting.getStatus() == VotingStatus.VOTING ? "iniciada" : "ocorreu"));
+            throw new InvalidVotingStatusException("Voting already " + (voting.getStatus() == VotingStatus.VOTING ? "started" : "happened"));
 
-        repository.startVoting(voting.getIdVoting(), LocalDateTime.now());
-        votingTimer(voting, durationInSeconds);
+        LocalDateTime startTime = LocalDateTime.now(clock);
+        LocalDateTime endTime = LocalDateTime.now(clock).plusSeconds(durationInSeconds);
+
+        repository.startVoting(voting.getIdVoting(), startTime, endTime);
 
         return "Voting for "+voting.getTopic().getTitle()+ " has started";
-    }
-
-    public void votingTimer(Voting voting, Integer seconds){
-        new Thread(() -> {
-                try{
-                    Thread.sleep((long) seconds * 1000);
-                    repository.closeVoting(voting.getIdVoting(), LocalDateTime.now());
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }).start();
-
     }
 }

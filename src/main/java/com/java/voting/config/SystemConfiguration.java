@@ -8,7 +8,7 @@ import java.time.Clock;
 @Configuration
 public class SystemConfiguration {
     @Bean
-    public Clock clock(){
+    public static Clock clock(){
         return Clock.systemDefaultZone();
     }
 }

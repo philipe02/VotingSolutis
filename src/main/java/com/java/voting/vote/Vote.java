@@ -1,14 +1,10 @@
 package com.java.voting.vote;
 
+import com.java.voting.associate.Associate;
+import com.java.voting.voting.Voting;
+import lombok.*;
+
 import javax.persistence.*;
-
-import com.java.voting.topic.TopicViewModel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -19,9 +15,13 @@ public class Vote {
     @Column(name = "id_vote", nullable = false)
     private Long idVote;
 
-    private Long idAssociate;
+    @OneToOne
+    @JoinColumn(name = "id_associate", referencedColumnName = "id_associate")
+    private Associate associate;
 
-    private Long idVoting;
+    @OneToOne
+    @JoinColumn(name = "id_voting", referencedColumnName = "id_voting")
+    private Voting voting;
 
     private LocalDateTime votingTime;
 
@@ -35,14 +35,14 @@ public class Vote {
         Vote vote = (Vote) o;
 
         return Objects.equals(this.idVote, vote.idVote)
-                && Objects.equals(this.idAssociate, vote.getIdAssociate())
-                && Objects.equals(this.idVoting, vote.getIdVoting())
+                && Objects.equals(this.associate, vote.getAssociate())
+                && Objects.equals(this.voting, vote.getVoting())
                 && Objects.equals(this.inFavour, vote.getInFavour())
                 && Objects.equals(this.votingTime, vote.getVotingTime());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idVote, idAssociate, idVoting, votingTime, inFavour);
+        return Objects.hash(idVote, associate, voting, votingTime, inFavour);
     }
 }

@@ -13,19 +13,10 @@ public class TopicService {
     @Autowired
     VotingRepository votingRepository;
 
-    public TopicViewModel getTopicById(Long idTopic){
+    public TopicDTO getTopicById(Long idTopic){
         Topic topic = repository.findById(idTopic).orElseThrow();
-        Voting voting = votingRepository.findByTopic(topic).orElse(new Voting());
-        TopicViewModel viewModel = TopicViewModel.createTopicViewModel(topic, voting);
 
-        if (viewModel.getPositiveVotes() > viewModel.getNegativeVotes())
-            viewModel.setResult("In favour");
-        else if (viewModel.getPositiveVotes().equals(viewModel.getNegativeVotes()))
-            viewModel.setResult("Draw");
-        else
-            viewModel.setResult("Against");
-
-        return viewModel;
+        return TopicDTO.createTopicDTO(topic);
     }
 
     public Topic saveTopic(Topic topicToSave){

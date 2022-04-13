@@ -17,7 +17,7 @@ public class VotingController {
 
     @Operation(summary = "Return Voting section of specified id")
     @GetMapping("/v1/{id}")
-    public ResponseEntity<Voting> getVotingById(@PathVariable("id") Long idVoting){
+    public ResponseEntity<VotingDTO> getVotingById(@PathVariable("id") Long idVoting){
         return new ResponseEntity<>(service.getVotingById(idVoting), HttpStatus.OK);
     }
 
@@ -28,7 +28,7 @@ public class VotingController {
     }
 
     @Operation(summary = "Start Voting section of specified id")
-    @PostMapping("/v1/start/{votingId}")
+    @PatchMapping("/v1/start/{votingId}")
     public ResponseEntity<String> startVoting(@PathVariable("votingId") Long idVoting, @RequestParam(name="duration", defaultValue = "60") Integer durationInSeconds){
         return new ResponseEntity<>(service.startVoting(idVoting, durationInSeconds), HttpStatus.OK);
     }
