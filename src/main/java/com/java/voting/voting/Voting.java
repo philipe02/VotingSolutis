@@ -46,8 +46,6 @@ public class Voting {
 
         return Objects.equals(this.idVoting, vote.getIdVoting())
                 && Objects.equals(this.topic, vote.getTopic())
-                && Objects.equals(this.positiveVotes, vote.getPositiveVotes())
-                && Objects.equals(this.negativeVotes, vote.getNegativeVotes())
                 && Objects.equals(this.startTime, vote.getStartTime())
                 && Objects.equals(this.endTime, vote.getEndTime())
                 && Objects.equals(this.status, vote.getStatus());
@@ -55,6 +53,6 @@ public class Voting {
 
     @Override
     public int hashCode() {
-        return Objects.hash(idVoting, topic, positiveVotes, negativeVotes, startTime, endTime, status);
+        return Objects.hash(idVoting, topic, startTime, endTime, status);
     }
 }

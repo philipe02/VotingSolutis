@@ -2,6 +2,7 @@ package com.java.voting.vote;
 
 import com.java.voting.associate.Associate;
 import com.java.voting.associate.AssociateRepository;
+import com.java.voting.exception.InvalidVotingStatusException;
 import com.java.voting.exception.VoteAlreadyRegisteredException;
 import com.java.voting.exception.VotingClosedException;
 import com.java.voting.topic.Topic;
@@ -15,10 +16,15 @@ import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 
 import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest
@@ -37,6 +43,14 @@ class VoteTests {
 
     Associate associate1 = Associate.builder().idAssociate(1L).name("Jose").build();
     Associate associate2 = Associate.builder().idAssociate(2L).name("Maria").build();
+
+    @TestConfiguration
+    public static class Config {
+        @Bean
+        public Clock clock(){
+            return Clock.fixed(Instant.parse("2021-09-10T12:00:00Z"), ZoneOffset.UTC);
+        }
+    }
 
     Voting votingOpen = Voting.builder()
             .idVoting(1L)
@@ -112,7 +126,7 @@ class VoteTests {
                 .associate(associate2)
                 .voting(votingInProgress)
                 .votingTime(LocalDateTime.now(clock))
-                .inFavour(true)
+                .inFavour(false)
                 .build();
 
         Vote voteInFavourReturned = Vote.builder().idVote(1L)
@@ -126,7 +140,7 @@ class VoteTests {
                 .associate(associate2)
                 .voting(votingInProgress)
                 .votingTime(LocalDateTime.now(clock))
-                .inFavour(true)
+                .inFavour(false)
                 .build();
 
         Mockito.when(repository.existsByVotingAndAssociate(voteInFavourReturned.getVoting(), voteInFavourReturned.getAssociate())).thenReturn(false);
@@ -136,6 +150,31 @@ class VoteTests {
 
         Assertions.assertEquals(voteInFavourReturned, service.saveVote(voteInFavour));
         Assertions.assertEquals(voteNotInFavourReturned, service.saveVote(voteNotInFavour));
+    }
+
+    @Test
+    void shouldReturnVoteList(){
+        Vote voteInFavourReturned = Vote.builder().idVote(1L)
+                .associate(associate1)
+                .voting(votingInProgress)
+                .votingTime(LocalDateTime.now(clock))
+                .inFavour(true)
+                .build();
+
+        Mockito.when(repository.findAll()).thenReturn(List.of(voteInFavourReturned));
+
+        Assertions.assertEquals(VoteDTO.createVoteDTO(voteInFavourReturned), service.getAllVotes().get(0));
+    }
+
+    @Test
+    void shouldThrowInvalidVotingStatus(){
+        VoteViewModel voteToNotInProgressVoting = VoteViewModel.builder()
+                .idAssociate(associate1.getIdAssociate())
+                .idVoting(votingOpen.getIdVoting())
+                .inFavour(true)
+                .build();
+
+        Assertions.assertThrows(InvalidVotingStatusException.class, () -> service.saveVote(voteToNotInProgressVoting));
     }
 
     @Test

@@ -1,6 +1,5 @@
 package com.java.voting.topic;
 
-import com.java.voting.voting.Voting;
 import com.java.voting.voting.VotingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,31 +32,39 @@ class VotingTests {
     VotingRepository repository;
     @MockBean
     TopicRepository topicRepository;
+    @MockBean
+    VotingResultsRepository votingResultsRepository;
+
+    @TestConfiguration
+    public static class Config {
+        @Bean
+        public Clock clock(){
+            return Clock.fixed(Instant.parse("2021-09-10T12:00:00Z"), ZoneOffset.UTC);
+        }
+    }
+
+    Topic topic = Topic.builder().idTopic(1L).title("Test").build();
+
+    Voting votingOpen = Voting.builder().idVoting(1L).topic(topic).positiveVotes(0).negativeVotes(0).status(VotingStatus.OPEN).build();
+    Voting votingClosed = Voting.builder().idVoting(1L).topic(topic).positiveVotes(3).negativeVotes(1).status(VotingStatus.CLOSED).build();
+    Voting votingInProgress = Voting.builder().idVoting(1L).topic(topic).positiveVotes(3).negativeVotes(1).status(VotingStatus.VOTING).build();
 
     @BeforeEach
     void setup(){
-        Topic topic = Topic.builder().idTopic(1L).title("Test").build();
-
         Mockito.when(topicRepository.findById(topic.getIdTopic())).thenReturn(Optional.of(topic));
-
     }
 
     @Test
     void shouldCreateVotingSuccessfully(){
-        Topic topic = Topic.builder().idTopic(1L).title("Test").build();
         Voting votingToSave = new Voting(topic);
-        Voting votingReturned = Voting.builder().idVoting(1L).topic(topic).positiveVotes(0).negativeVotes(0).status(VotingStatus.OPEN).build();
 
-        Mockito.when(repository.save(votingToSave)).thenReturn(votingReturned);
+        Mockito.when(repository.save(votingToSave)).thenReturn(votingOpen);
 
-        Assertions.assertEquals(votingReturned, service.createVoting(topic.getIdTopic()));
+        Assertions.assertEquals(votingOpen, service.createVoting(topic.getIdTopic()));
     }
 
     @Test
     void shouldThrowVotingAlreadyExists(){
-        Topic topic = Topic.builder().idTopic(1L).title("Test").build();
-        Voting votingToSave = new Voting(topic);
-
         Mockito.when(repository.existsByTopic(topic)).thenReturn(true);
 
         Assertions.assertThrows(VotingAlreadyExistsException.class, () -> service.createVoting(topic.getIdTopic()));
@@ -65,21 +72,38 @@ class VotingTests {
 
     @Test
     void shouldStartVotingSuccessfully(){
-        Topic topic = Topic.builder().idTopic(1L).title("Test").build();
-        Voting voting = Voting.builder().idVoting(1L).topic(topic).positiveVotes(0).negativeVotes(0).status(VotingStatus.OPEN).build();
+        Mockito.when(repository.findById(votingOpen.getIdVoting())).thenReturn(Optional.of(votingOpen));
 
-        Mockito.when(repository.findById(voting.getIdVoting())).thenReturn(Optional.of(voting));
-
-        Assertions.assertEquals(service.startVoting(voting.getIdVoting(), 1), "Voting for " + topic.getTitle() + " has started");
+        Assertions.assertEquals(service.startVoting(votingOpen.getIdVoting(), 1), "Voting for " + topic.getTitle() + " has started");
     }
 
     @Test
     void shouldThrowInvalidVotingStatusException(){
-        Topic topic = Topic.builder().idTopic(1L).title("Test").build();
-        Voting voting = Voting.builder().idVoting(1L).topic(topic).positiveVotes(0).negativeVotes(0).status(VotingStatus.CLOSED).build();
+        Mockito.when(repository.findById(votingClosed.getIdVoting())).thenReturn(Optional.of(votingClosed));
 
-        Mockito.when(repository.findById(voting.getIdVoting())).thenReturn(Optional.of(voting));
+        Assertions.assertThrows(InvalidVotingStatusException.class, () -> service.startVoting(votingClosed.getIdVoting(), 1));
+    }
 
-        Assertions.assertThrows(InvalidVotingStatusException.class, () -> service.startVoting(voting.getIdVoting(), 1));
+    @Test
+    void shouldShowVotingResults(){
+        VotingResults votingResults = VotingResults.builder()
+                .idVotingResult(1L)
+                .voting(votingClosed)
+                .result("In favour")
+                .positiveRatio(75.0)
+                .negativeRatio(25.0)
+                .build();
+
+        Mockito.when(repository.findById(votingClosed.getIdVoting())).thenReturn(Optional.of(votingClosed));
+        Mockito.when(votingResultsRepository.findByVoting(votingClosed)).thenReturn(Optional.of(votingResults));
+
+        Assertions.assertEquals(VotingResultsDTO.createVotingResultsDTO(votingResults), service.showResultsOfVoting(votingClosed.getIdVoting()));
+    }
+
+    @Test
+    void shouldThrowInvalidVotingStatusWhenGetResults(){
+        Mockito.when(repository.findById(votingInProgress.getIdVoting())).thenReturn(Optional.of(votingInProgress));
+
+        Assertions.assertThrows(InvalidVotingStatusException.class, ()->service.showResultsOfVoting(votingInProgress.getIdVoting()));
     }
 }

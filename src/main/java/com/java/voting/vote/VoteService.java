@@ -38,7 +38,7 @@ public class VoteService {
         Associate associate = associateRepository.findById(vote.idAssociate()).orElseThrow();
 
         if(voting.getStatus() != VotingStatus.VOTING)
-            throw new InvalidVotingStatusException("Voting is not open");
+            throw new InvalidVotingStatusException("Voting is not in progress");
 
         if(repository.existsByVotingAndAssociate(voting, associate))
            throw new VoteAlreadyRegisteredException("Vote for this topic already registered");

@@ -30,12 +30,4 @@ class VotingApplicationTests {
 		Assertions.assertNotNull(voteController);
 		Assertions.assertNotNull(votingController);
 	}
-
-	@TestConfiguration
-	public static class Config {
-		@Bean
-		public Clock clock(){
-			return Clock.fixed(Instant.parse("2021-09-10T12:00:00Z"), ZoneOffset.UTC);
-		}
-	}
 }

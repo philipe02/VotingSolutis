@@ -52,11 +52,12 @@ public class VotingService {
 
     public VotingResultsDTO showResultsOfVoting(Long idVoting){
         Voting voting = repository.findById(idVoting).orElseThrow();
-        VotingResults votingResults = votingResultsRepository.findByVoting(voting).orElseThrow();
 
         if(voting.getStatus() != VotingStatus.CLOSED){
             throw new InvalidVotingStatusException("Results not collected yet");
         }
+
+        VotingResults votingResults = votingResultsRepository.findByVoting(voting).orElseThrow();
 
         return VotingResultsDTO.createVotingResultsDTO(votingResults);
     }
