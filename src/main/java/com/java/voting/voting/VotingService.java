@@ -4,6 +4,7 @@ import com.java.voting.exception.InvalidVotingStatusException;
 import com.java.voting.exception.VotingAlreadyExistsException;
 import com.java.voting.topic.Topic;
 import com.java.voting.topic.TopicRepository;
+import com.java.voting.utils.VotingUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,8 @@ public class VotingService {
     VotingRepository repository;
     @Autowired
     TopicRepository topicRepository;
+    @Autowired
+    VotingResultsRepository votingResultsRepository;
 
     public VotingDTO getVotingById(Long idVoting){
         return VotingDTO.createVotingDTO(repository.findById(idVoting).orElseThrow());
@@ -45,5 +48,16 @@ public class VotingService {
         repository.startVoting(voting.getIdVoting(), startTime, endTime);
 
         return "Voting for "+voting.getTopic().getTitle()+ " has started";
+    }
+
+    public VotingResultsDTO showResultsOfVoting(Long idVoting){
+        Voting voting = repository.findById(idVoting).orElseThrow();
+        VotingResults votingResults = votingResultsRepository.findByVoting(voting).orElseThrow();
+
+        if(voting.getStatus() != VotingStatus.CLOSED){
+            throw new InvalidVotingStatusException("Results not collected yet");
+        }
+
+        return VotingResultsDTO.createVotingResultsDTO(votingResults);
     }
 }

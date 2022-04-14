@@ -32,4 +32,10 @@ public class VotingController {
     public ResponseEntity<String> startVoting(@PathVariable("votingId") Long idVoting, @RequestParam(name="duration", defaultValue = "60") Integer durationInSeconds){
         return new ResponseEntity<>(service.startVoting(idVoting, durationInSeconds), HttpStatus.OK);
     }
+
+    @Operation(summary = "Get results of the specified voting id")
+    @GetMapping("/v1/results/{votingId}")
+    public ResponseEntity<VotingResultsDTO> showResultsOfVoting(@PathVariable("votingId") Long idVoting){
+        return new ResponseEntity<>(service.showResultsOfVoting(idVoting), HttpStatus.OK);
+    }
 }

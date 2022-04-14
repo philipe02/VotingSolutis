@@ -10,15 +10,6 @@ import java.time.format.DateTimeFormatter;
 
 @Component
 public class VotingUtils {
-    private static Clock clock;
-
-    @Autowired
-    public VotingUtils(Clock clock){
-        VotingUtils.clock = clock;
-    }
-
-    private VotingUtils(){}
-
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss:SS");
 
     public static Double ratioCalculator(Double total, Double value){
@@ -31,10 +22,6 @@ public class VotingUtils {
         if (voting.getPositiveVotes().equals(voting.getNegativeVotes()))
             return "Draw";
         return "Against";
-    }
-
-    public static Boolean isVoteInTime(LocalDateTime startTime, LocalDateTime endTime){
-        return LocalDateTime.now(clock).isAfter(startTime) && LocalDateTime.now(clock).isBefore(endTime);
     }
 
     public static String dateTimeFormatter(LocalDateTime dateTime){

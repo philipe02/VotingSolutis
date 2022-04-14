@@ -2,6 +2,7 @@ package com.java.voting.vote;
 
 import com.java.voting.associate.Associate;
 import com.java.voting.associate.AssociateRepository;
+import com.java.voting.exception.InvalidVotingStatusException;
 import com.java.voting.exception.VoteAlreadyRegisteredException;
 import com.java.voting.exception.VotingClosedException;
 import com.java.voting.utils.VotingUtils;
@@ -36,17 +37,20 @@ public class VoteService {
         Voting voting = votingRepository.findById(vote.idVoting()).orElseThrow();
         Associate associate = associateRepository.findById(vote.idAssociate()).orElseThrow();
 
+        if(voting.getStatus() != VotingStatus.VOTING)
+            throw new InvalidVotingStatusException("Voting is not open");
+
+        if(repository.existsByVotingAndAssociate(voting, associate))
+           throw new VoteAlreadyRegisteredException("Vote for this topic already registered");
+
+        if (!this.isVoteInTime(voting.getStartTime(), voting.getEndTime()))
+            throw new VotingClosedException("Voting is already closed");
+
         Vote voteToSave = Vote.builder()
                 .associate(associate)
                 .voting(voting)
                 .inFavour(vote.inFavour())
                 .build();
-
-        if(repository.existsByVotingAndAssociate(voting, associate))
-           throw new VoteAlreadyRegisteredException("Vote for this topic already registered");
-
-        if (!VotingUtils.isVoteInTime(voting.getStartTime(), voting.getEndTime()))
-            throw new VotingClosedException("Voting is already closed");
 
         if (voteToSave.getInFavour())
             voting.setPositiveVotes(voting.getPositiveVotes() + 1);
@@ -58,5 +62,10 @@ public class VoteService {
         votingRepository.save(voting);
 
         return repository.save(voteToSave);
+    }
+
+    private Boolean isVoteInTime(LocalDateTime startTime, LocalDateTime endTime){
+        LocalDateTime agora =  LocalDateTime.now(clock);
+        return LocalDateTime.now(clock).isAfter(startTime) && LocalDateTime.now(clock).isBefore(endTime);
     }
 }

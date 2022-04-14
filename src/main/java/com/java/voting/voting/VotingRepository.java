@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface VotingRepository extends JpaRepository<Voting, Long> {
@@ -14,7 +15,7 @@ public interface VotingRepository extends JpaRepository<Voting, Long> {
     @Modifying
     @Transactional
     @Query(value = "UPDATE voting SET status = 2 WHERE id_voting=?1", nativeQuery = true)
-    void closeVoting(Long idVoting, LocalDateTime endTime);
+    void closeVoting(Long idVoting);
 
     @Modifying
     @Transactional
@@ -24,5 +25,8 @@ public interface VotingRepository extends JpaRepository<Voting, Long> {
     boolean existsByTopic(Topic topic);
 
     Optional<Voting> findByTopic(Topic topic);
+
+    @Query(value = "SELECT * FROM voting WHERE status=1 AND end_time < CURRENT_TIMESTAMP", nativeQuery = true)
+    List<Voting> findAllVotingEndedAndNotClosed();
 
 }

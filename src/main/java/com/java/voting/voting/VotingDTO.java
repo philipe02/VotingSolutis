@@ -4,7 +4,7 @@ import com.java.voting.topic.TopicDTO;
 import com.java.voting.utils.VotingUtils;
 import lombok.Builder;
 
-public record VotingDTO(Long idVoting, TopicDTO topic, Integer positiveVotes, Integer negativeVotes, String startTime, String endTime, VotingStatus status) {
+public record VotingDTO(Long idVoting, TopicDTO topic, Integer positiveVotes, Integer negativeVotes,Integer totalVotes, String startTime, String endTime, VotingStatus status) {
 
     @Builder
     public VotingDTO{}
@@ -15,6 +15,7 @@ public record VotingDTO(Long idVoting, TopicDTO topic, Integer positiveVotes, In
                 .topic(TopicDTO.createTopicDTO(voting.getTopic()))
                 .positiveVotes(voting.getPositiveVotes())
                 .negativeVotes(voting.getNegativeVotes())
+                .totalVotes(voting.getPositiveVotes() + voting.getNegativeVotes())
                 .startTime(VotingUtils.dateTimeFormatter(voting.getStartTime()))
                 .endTime(VotingUtils.dateTimeFormatter(voting.getEndTime()))
                 .status(voting.getStatus())

@@ -24,7 +24,6 @@ import java.util.Optional;
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VoteTests {
-
     @Autowired
     Clock clock;
     @Autowired
@@ -53,11 +52,36 @@ class VoteTests {
             .negativeVotes(0)
             .status(VotingStatus.CLOSED)
             .build();
+    Voting votingNotCollected = Voting.builder()
+            .idVoting(3L)
+            .topic(new Topic(3L, "Test Not Collect", null))
+            .positiveVotes(0)
+            .negativeVotes(0)
+            .status(VotingStatus.VOTING)
+            .build();
+    Voting votingInProgress = Voting.builder()
+            .idVoting(4L)
+            .topic(new Topic(4L, "Test In Progress", null))
+            .positiveVotes(0)
+            .negativeVotes(0)
+            .status(VotingStatus.VOTING)
+            .build();
 
     @BeforeEach
     void setup(){
+        votingClosed.setStartTime(LocalDateTime.now(clock).minusMinutes(2));
+        votingClosed.setEndTime(LocalDateTime.now(clock).minusMinutes(1));
+
+        votingNotCollected.setStartTime(LocalDateTime.now(clock).minusMinutes(2));
+        votingNotCollected.setEndTime(LocalDateTime.now(clock).minusMinutes(1));
+
+        votingInProgress.setStartTime(LocalDateTime.now(clock).minusMinutes(1));
+        votingInProgress.setEndTime(LocalDateTime.now(clock).plusMinutes(1));
+
         Mockito.when(votingRepository.findById(votingOpen.getIdVoting())).thenReturn(Optional.of(votingOpen));
         Mockito.when(votingRepository.findById(votingClosed.getIdVoting())).thenReturn(Optional.of(votingClosed));
+        Mockito.when(votingRepository.findById(votingNotCollected.getIdVoting())).thenReturn(Optional.of(votingNotCollected));
+        Mockito.when(votingRepository.findById(votingInProgress.getIdVoting())).thenReturn(Optional.of(votingInProgress));
 
         Mockito.when(associateRepository.findById(associate1.getIdAssociate())).thenReturn(Optional.of(associate1));
         Mockito.when(associateRepository.findById(associate2.getIdAssociate())).thenReturn(Optional.of(associate2));
@@ -70,38 +94,37 @@ class VoteTests {
 
         VoteViewModel voteInFavour = VoteViewModel.builder()
                 .idAssociate(associate1.getIdAssociate())
-                .idVoting(votingOpen.getIdVoting())
+                .idVoting(votingInProgress.getIdVoting())
                 .inFavour(true)
                 .build();
         VoteViewModel voteNotInFavour = VoteViewModel.builder()
                 .idAssociate(associate2.getIdAssociate())
-                .idVoting(votingOpen.getIdVoting())
+                .idVoting(votingInProgress.getIdVoting())
                 .inFavour(false)
                 .build();
-
         Vote voteInFavourToSave = Vote.builder()
                 .associate(associate1)
-                .voting(votingOpen)
+                .voting(votingInProgress)
                 .votingTime(LocalDateTime.now(clock))
                 .inFavour(true)
                 .build();
         Vote voteNotInFavourToSave = Vote.builder()
                 .associate(associate2)
-                .voting(votingOpen)
+                .voting(votingInProgress)
                 .votingTime(LocalDateTime.now(clock))
                 .inFavour(true)
                 .build();
 
         Vote voteInFavourReturned = Vote.builder().idVote(1L)
                 .associate(associate1)
-                .voting(votingOpen)
+                .voting(votingInProgress)
                 .votingTime(LocalDateTime.now(clock))
                 .inFavour(true)
                 .build();
         Vote voteNotInFavourReturned = Vote.builder()
                 .idVote(2L)
                 .associate(associate2)
-                .voting(votingOpen)
+                .voting(votingInProgress)
                 .votingTime(LocalDateTime.now(clock))
                 .inFavour(true)
                 .build();
@@ -119,7 +142,7 @@ class VoteTests {
     void shouldThrowVotingClosedException(){
         VoteViewModel voteToClosedVoting = VoteViewModel.builder()
                 .idAssociate(associate1.getIdAssociate())
-                .idVoting(votingClosed.getIdVoting())
+                .idVoting(votingNotCollected.getIdVoting())
                 .inFavour(true)
                 .build();
 
@@ -130,11 +153,11 @@ class VoteTests {
     void shouldThrowVotingAlreadyRegisteredException(){
         VoteViewModel vote = VoteViewModel.builder()
                 .idAssociate(associate1.getIdAssociate())
-                .idVoting(votingOpen.getIdVoting())
+                .idVoting(votingInProgress.getIdVoting())
                 .inFavour(true)
                 .build();
 
-        Mockito.when(repository.existsByVotingAndAssociate(votingOpen, associate1)).thenReturn(true);
+        Mockito.when(repository.existsByVotingAndAssociate(votingInProgress, associate1)).thenReturn(true);
 
         Assertions.assertThrows(VoteAlreadyRegisteredException.class, ()->service.saveVote(vote));
     }
