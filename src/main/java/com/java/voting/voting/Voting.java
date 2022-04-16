@@ -1,10 +1,13 @@
 package com.java.voting.voting;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.java.voting.topic.Topic;
+import com.java.voting.vote.Vote;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Entity @Table(name = "voting")
@@ -33,6 +36,12 @@ public class Voting {
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
+
+    @Transient @JsonIgnore @OneToMany(mappedBy = "voting")
+    private List<Vote> votes;
+
+    @Transient @JsonIgnore @OneToOne(mappedBy = "voting")
+    private VotingResults votingResults;
 
     @Enumerated(EnumType.ORDINAL)
     private VotingStatus status;

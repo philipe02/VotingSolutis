@@ -8,7 +8,9 @@ import lombok.Builder;
 public record VoteDTO(Long idVote, AssociateDTO associate, VotingDTO voting, String votingTime, Boolean inFavour) {
 
     @Builder
-    public VoteDTO{}
+    public VoteDTO{
+        //Construtor vazio para utilizar o builder do Lombok em um record
+    }
 
     public static VoteDTO createVoteDTO(Vote vote){
         return VoteDTO.builder()

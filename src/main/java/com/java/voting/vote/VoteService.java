@@ -2,10 +2,11 @@ package com.java.voting.vote;
 
 import com.java.voting.associate.Associate;
 import com.java.voting.associate.AssociateRepository;
+import com.java.voting.exception.InvalidCpfException;
 import com.java.voting.exception.InvalidVotingStatusException;
 import com.java.voting.exception.VoteAlreadyRegisteredException;
 import com.java.voting.exception.VotingClosedException;
-import com.java.voting.utils.VotingUtils;
+import com.java.voting.external.cpfValidation.CpfValidationService;
 import com.java.voting.voting.Voting;
 import com.java.voting.voting.VotingRepository;
 import com.java.voting.voting.VotingStatus;
@@ -24,6 +25,8 @@ public class VoteService {
     @Autowired
     VoteRepository repository;
     @Autowired
+    CpfValidationService cpfValidationService;
+    @Autowired
     VotingRepository votingRepository;
     @Autowired
     AssociateRepository associateRepository;
@@ -40,7 +43,10 @@ public class VoteService {
         if(voting.getStatus() != VotingStatus.VOTING)
             throw new InvalidVotingStatusException("Voting is not in progress");
 
-        if(repository.existsByVotingAndAssociate(voting, associate))
+        if(!cpfValidationService.validateCpf(associate.getCpf()))
+            throw new InvalidCpfException("Cpf from associate is invalid");
+
+        if(Boolean.TRUE.equals(repository.existsByVotingAndAssociate(voting, associate)))
            throw new VoteAlreadyRegisteredException("Vote for this topic already registered");
 
         if (!this.isVoteInTime(voting.getStartTime(), voting.getEndTime()))
@@ -65,7 +71,6 @@ public class VoteService {
     }
 
     private Boolean isVoteInTime(LocalDateTime startTime, LocalDateTime endTime){
-        LocalDateTime agora =  LocalDateTime.now(clock);
         return LocalDateTime.now(clock).isAfter(startTime) && LocalDateTime.now(clock).isBefore(endTime);
     }
 }

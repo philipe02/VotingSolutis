@@ -67,7 +67,7 @@ class VotingTests {
     void shouldThrowVotingAlreadyExists(){
         Mockito.when(repository.existsByTopic(topic)).thenReturn(true);
 
-        Assertions.assertThrows(VotingAlreadyExistsException.class, () -> service.createVoting(topic.getIdTopic()));
+        Assertions.assertThrows(VotingAlreadyExistsException.class, () -> service.createVoting(1L));
     }
 
     @Test
@@ -81,7 +81,7 @@ class VotingTests {
     void shouldThrowInvalidVotingStatusException(){
         Mockito.when(repository.findById(votingClosed.getIdVoting())).thenReturn(Optional.of(votingClosed));
 
-        Assertions.assertThrows(InvalidVotingStatusException.class, () -> service.startVoting(votingClosed.getIdVoting(), 1));
+        Assertions.assertThrows(InvalidVotingStatusException.class, () -> service.startVoting(1L, 1));
     }
 
     @Test
@@ -104,6 +104,6 @@ class VotingTests {
     void shouldThrowInvalidVotingStatusWhenGetResults(){
         Mockito.when(repository.findById(votingInProgress.getIdVoting())).thenReturn(Optional.of(votingInProgress));
 
-        Assertions.assertThrows(InvalidVotingStatusException.class, ()->service.showResultsOfVoting(votingInProgress.getIdVoting()));
+        Assertions.assertThrows(InvalidVotingStatusException.class, () -> service.showResultsOfVoting(1L));
     }
 }

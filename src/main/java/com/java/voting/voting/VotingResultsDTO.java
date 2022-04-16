@@ -5,7 +5,9 @@ import lombok.Builder;
 public record VotingResultsDTO(Long idVotingResult, VotingDTO voting, String result, Double positiveRatio, Double negativeRatio) {
 
     @Builder
-    public VotingResultsDTO{}
+    public VotingResultsDTO{
+        //Construtor vazio para utilizar o builder do Lombok em um record
+    }
 
     public static VotingResultsDTO createVotingResultsDTO(VotingResults votingResults){
         return VotingResultsDTO.builder()

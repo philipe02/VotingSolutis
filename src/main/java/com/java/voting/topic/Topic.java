@@ -1,5 +1,7 @@
 package com.java.voting.topic;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.java.voting.voting.Voting;
 import lombok.*;
 
 import javax.persistence.*;
@@ -16,6 +18,9 @@ public class Topic {
     private String title;
 
     private String description;
+
+    @Transient @JsonIgnore @OneToOne(mappedBy = "topic")
+    private Voting voting;
 
     @Override
     public boolean equals(Object o){

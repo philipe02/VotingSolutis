@@ -5,6 +5,7 @@ import com.java.voting.exception.VotingAlreadyExistsException;
 import com.java.voting.topic.Topic;
 import com.java.voting.topic.TopicRepository;
 import com.java.voting.utils.VotingUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 
 @Service
+@Slf4j
 public class VotingService {
 
     @Autowired
@@ -24,7 +26,9 @@ public class VotingService {
     VotingResultsRepository votingResultsRepository;
 
     public VotingDTO getVotingById(Long idVoting){
-        return VotingDTO.createVotingDTO(repository.findById(idVoting).orElseThrow());
+        return repository.findById(idVoting)
+                .map(VotingDTO::createVotingDTO)
+                .orElseThrow();
     }
 
     public Voting createVoting(Long idTopic){
@@ -42,10 +46,9 @@ public class VotingService {
         if (voting.getStatus() != VotingStatus.OPEN)
             throw new InvalidVotingStatusException("Voting already " + (voting.getStatus() == VotingStatus.VOTING ? "started" : "happened"));
 
-        LocalDateTime startTime = LocalDateTime.now(clock);
-        LocalDateTime endTime = LocalDateTime.now(clock).plusSeconds(durationInSeconds);
+        repository.startVoting(voting.getIdVoting(), LocalDateTime.now(clock), LocalDateTime.now(clock).plusSeconds(durationInSeconds));
 
-        repository.startVoting(voting.getIdVoting(), startTime, endTime);
+        log.info("Voting for "+voting.getTopic().getTitle()+ " has started");
 
         return "Voting for "+voting.getTopic().getTitle()+ " has started";
     }

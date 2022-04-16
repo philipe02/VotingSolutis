@@ -1,5 +1,6 @@
 package com.java.voting.scheduler;
 
+import com.java.voting.config.messager.MessageSender;
 import com.java.voting.utils.VotingUtils;
 import com.java.voting.voting.Voting;
 import com.java.voting.voting.VotingRepository;
@@ -10,13 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
 @Slf4j
 public class ScheduledTasks {
 
+    @Autowired
+    MessageSender messageSender;
     @Autowired
     VotingRepository votingRepository;
     @Autowired
@@ -29,11 +31,15 @@ public class ScheduledTasks {
         List<Voting> votingToCollectList = votingRepository.findAllVotingEndedAndNotClosed();
 
         //Salva os VotingResults e fecha as votações correspondentes
-        if(votingToCollectList.size() > 0) {
+        if (!votingToCollectList.isEmpty()) {
             votingToCollectList.stream()
                     .map(this::collectAndSaveResultsFromVoting)
-                    .forEach(votingResults -> votingRepository.closeVoting(votingResults.getVoting().getIdVoting()));
-        }
+                    .forEach(votingResults -> {
+                        votingRepository.closeVoting(votingResults.getVoting().getIdVoting());
+                        messageSender.send("Voting for " + votingResults.getVoting().getTopic().getTitle() + " collected");
+                    });
+            }
+
     }
 
     private VotingResults collectAndSaveResultsFromVoting(Voting voting){

@@ -23,7 +23,7 @@ public class TopicController {
 
     @Operation(summary = "Create a new topic with informed values")
     @PostMapping("/v1")
-    public ResponseEntity<Topic> saveTopic(@RequestBody Topic topic){
+    public ResponseEntity<Topic> saveTopic(@RequestBody TopicDTO topic){
         return new ResponseEntity<>(service.saveTopic(topic), HttpStatus.CREATED);
     }
 }

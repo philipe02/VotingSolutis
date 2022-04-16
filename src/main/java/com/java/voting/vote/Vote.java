@@ -15,11 +15,11 @@ public class Vote {
     @Column(name = "id_vote", nullable = false)
     private Long idVote;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "id_associate", referencedColumnName = "id_associate")
     private Associate associate;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "id_voting", referencedColumnName = "id_voting")
     private Voting voting;
 

@@ -2,9 +2,11 @@ package com.java.voting.vote;
 
 import com.java.voting.associate.Associate;
 import com.java.voting.associate.AssociateRepository;
+import com.java.voting.exception.InvalidCpfException;
 import com.java.voting.exception.InvalidVotingStatusException;
 import com.java.voting.exception.VoteAlreadyRegisteredException;
 import com.java.voting.exception.VotingClosedException;
+import com.java.voting.external.cpfValidation.CpfValidationService;
 import com.java.voting.topic.Topic;
 import com.java.voting.voting.Voting;
 import com.java.voting.voting.VotingRepository;
@@ -37,12 +39,15 @@ class VoteTests {
     @MockBean
     VoteRepository repository;
     @MockBean
+    CpfValidationService cpfValidationService;
+    @MockBean
     VotingRepository votingRepository;
     @MockBean
     AssociateRepository associateRepository;
 
-    Associate associate1 = Associate.builder().idAssociate(1L).name("Jose").build();
-    Associate associate2 = Associate.builder().idAssociate(2L).name("Maria").build();
+    Associate associate1 = Associate.builder().idAssociate(1L).name("Jose").cpf("1").build();
+    Associate associate2 = Associate.builder().idAssociate(2L).name("Maria").cpf("1").build();
+    Associate associateCpfInvalid = Associate.builder().idAssociate(3L).name("Fulano").cpf("2").build();
 
     @TestConfiguration
     public static class Config {
@@ -54,28 +59,28 @@ class VoteTests {
 
     Voting votingOpen = Voting.builder()
             .idVoting(1L)
-            .topic(new Topic(1L, "Test", null))
+            .topic(new Topic(1L, "Test", null, null))
             .positiveVotes(0)
             .negativeVotes(0)
             .status(VotingStatus.OPEN)
             .build();
     Voting votingClosed = Voting.builder()
             .idVoting(2L)
-            .topic(new Topic(2L, "Test closed", null))
+            .topic(new Topic(2L, "Test closed", null, null))
             .positiveVotes(0)
             .negativeVotes(0)
             .status(VotingStatus.CLOSED)
             .build();
     Voting votingNotCollected = Voting.builder()
             .idVoting(3L)
-            .topic(new Topic(3L, "Test Not Collect", null))
+            .topic(new Topic(3L, "Test Not Collect", null, null))
             .positiveVotes(0)
             .negativeVotes(0)
             .status(VotingStatus.VOTING)
             .build();
     Voting votingInProgress = Voting.builder()
             .idVoting(4L)
-            .topic(new Topic(4L, "Test In Progress", null))
+            .topic(new Topic(4L, "Test In Progress", null, null))
             .positiveVotes(0)
             .negativeVotes(0)
             .status(VotingStatus.VOTING)
@@ -91,6 +96,9 @@ class VoteTests {
 
         votingInProgress.setStartTime(LocalDateTime.now(clock).minusMinutes(1));
         votingInProgress.setEndTime(LocalDateTime.now(clock).plusMinutes(1));
+
+        Mockito.when(cpfValidationService.validateCpf("1")).thenReturn(true);
+        Mockito.when(cpfValidationService.validateCpf("2")).thenThrow(InvalidCpfException.class);
 
         Mockito.when(votingRepository.findById(votingOpen.getIdVoting())).thenReturn(Optional.of(votingOpen));
         Mockito.when(votingRepository.findById(votingClosed.getIdVoting())).thenReturn(Optional.of(votingClosed));

@@ -1,12 +1,16 @@
 package com.java.voting.associate;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.java.voting.vote.Vote;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Objects;
 
 @Entity @Table(name = "ASSOCIATE")
@@ -17,6 +21,11 @@ public class Associate {
     private Long idAssociate;
 
     private String name;
+
+    private String cpf;
+
+    @Transient @JsonIgnore @OneToMany(mappedBy = "associate")
+    private List<Vote> votes;
 
     @Override
     public boolean equals(Object o) {

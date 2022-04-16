@@ -18,7 +18,8 @@ public class TopicService {
         return TopicDTO.createTopicDTO(topic);
     }
 
-    public Topic saveTopic(Topic topicToSave){
+    public Topic saveTopic(TopicDTO topicDTO){
+        Topic topicToSave = Topic.builder().title(topicDTO.title()).description(topicDTO.description()).build();
         return repository.save(topicToSave);
     }
 

@@ -8,6 +8,8 @@ import java.time.format.DateTimeFormatter;
 
 @Component
 public class VotingUtils {
+    private VotingUtils(){}
+
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss:SS");
 
     public static Double ratioCalculator(Double total, Double value){

@@ -27,7 +27,7 @@ public class VotingController {
         return new ResponseEntity<>(service.createVoting(idTopic), HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Start Voting section of specified id")
+    @Operation(summary = "Start Voting section of specified id which will be open by the time in seconds specified in duration")
     @PatchMapping("/v1/start/{votingId}")
     public ResponseEntity<String> startVoting(@PathVariable("votingId") Long idVoting, @RequestParam(name="duration", defaultValue = "60") Integer durationInSeconds){
         return new ResponseEntity<>(service.startVoting(idVoting, durationInSeconds), HttpStatus.OK);
