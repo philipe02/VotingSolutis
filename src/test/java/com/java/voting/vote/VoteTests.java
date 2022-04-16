@@ -6,7 +6,7 @@ import com.java.voting.exception.InvalidCpfException;
 import com.java.voting.exception.InvalidVotingStatusException;
 import com.java.voting.exception.VoteAlreadyRegisteredException;
 import com.java.voting.exception.VotingClosedException;
-import com.java.voting.external.cpfValidation.CpfValidationService;
+import com.java.voting.external.cpf_validation.CpfValidationService;
 import com.java.voting.topic.Topic;
 import com.java.voting.voting.Voting;
 import com.java.voting.voting.VotingRepository;

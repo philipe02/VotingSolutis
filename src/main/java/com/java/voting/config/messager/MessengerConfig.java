@@ -12,18 +12,18 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MessengerConfig {
-    static final String topicExchangeName = "spring-boot-exchange";
+    static final String TOPIC_EXCHANGE_NAME = "spring-boot-exchange";
 
-    static final String queueName = "voting";
+    static final String QUEUE_NAME = "voting";
 
     @Bean
     Queue queue(){
-        return new Queue(queueName, false);
+        return new Queue(QUEUE_NAME, false);
     }
 
     @Bean
     TopicExchange exchange(){
-        return new TopicExchange(topicExchangeName);
+        return new TopicExchange(TOPIC_EXCHANGE_NAME);
     }
 
     @Bean
@@ -35,7 +35,7 @@ public class MessengerConfig {
     SimpleMessageListenerContainer container(ConnectionFactory connectionFactory, MessageListenerAdapter listenerAdapter){
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(queueName);
+        container.setQueueNames(QUEUE_NAME);
         container.setMessageListener(listenerAdapter);
         return container;
     }
