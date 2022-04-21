@@ -1,6 +1,6 @@
 package com.java.voting.utils;
 
-import com.java.voting.voting.Voting;
+import com.java.voting.model.entity.Voting;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

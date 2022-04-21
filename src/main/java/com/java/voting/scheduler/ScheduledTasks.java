@@ -1,11 +1,11 @@
 package com.java.voting.scheduler;
 
-import com.java.voting.config.messager.MessageSender;
+import com.java.voting.messenger.MessageSender;
 import com.java.voting.utils.VotingUtils;
-import com.java.voting.voting.Voting;
-import com.java.voting.voting.VotingRepository;
-import com.java.voting.voting.VotingResults;
-import com.java.voting.voting.VotingResultsRepository;
+import com.java.voting.model.entity.Voting;
+import com.java.voting.repository.VotingRepository;
+import com.java.voting.model.entity.VotingResults;
+import com.java.voting.repository.VotingResultsRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -38,7 +38,7 @@ public class ScheduledTasks {
                         votingRepository.closeVoting(votingResults.getVoting().getIdVoting());
                         messageSender.send("Voting for " + votingResults.getVoting().getTopic().getTitle() + " collected");
                     });
-            }
+        }
 
     }
 

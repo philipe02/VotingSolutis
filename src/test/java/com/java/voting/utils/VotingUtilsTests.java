@@ -1,6 +1,6 @@
 package com.java.voting.utils;
 
-import com.java.voting.voting.Voting;
+import com.java.voting.model.entity.Voting;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

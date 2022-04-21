@@ -2,8 +2,16 @@ package com.java.voting.voting;
 
 import com.java.voting.exception.InvalidVotingStatusException;
 import com.java.voting.exception.VotingAlreadyExistsException;
-import com.java.voting.topic.Topic;
-import com.java.voting.topic.TopicRepository;
+import com.java.voting.model.dto.VotingDTO;
+import com.java.voting.model.dto.VotingResultsDTO;
+import com.java.voting.model.entity.Voting;
+import com.java.voting.model.entity.VotingResults;
+import com.java.voting.model.entity.Topic;
+import com.java.voting.enums.VotingStatus;
+import com.java.voting.repository.VotingRepository;
+import com.java.voting.repository.VotingResultsRepository;
+import com.java.voting.service.VotingService;
+import com.java.voting.repository.TopicRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,8 +34,6 @@ class VotingTests {
 
     @Autowired
     VotingService service;
-    @Autowired
-    Clock clock;
     @MockBean
     VotingRepository repository;
     @MockBean
@@ -60,7 +66,7 @@ class VotingTests {
 
         Mockito.when(repository.save(votingToSave)).thenReturn(votingOpen);
 
-        Assertions.assertEquals(votingOpen, service.createVoting(topic.getIdTopic()));
+        Assertions.assertEquals(VotingDTO.createVotingDTO(votingOpen), service.createVoting(topic.getIdTopic()));
     }
 
     @Test

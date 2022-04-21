@@ -1,8 +1,10 @@
 package com.java.voting.topic;
 
-import com.java.voting.voting.Voting;
-import com.java.voting.voting.VotingRepository;
-import com.java.voting.voting.VotingStatus;
+import com.java.voting.model.dto.TopicDTO;
+import com.java.voting.model.entity.Topic;
+import com.java.voting.model.form.TopicForm;
+import com.java.voting.repository.TopicRepository;
+import com.java.voting.service.TopicService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -35,6 +37,18 @@ class TopicTests {
         TopicDTO topicReturned = TopicDTO.builder().idTopic(1L).title("Teste").build();
 
         Assertions.assertEquals(topicReturned, service.getTopicById(topicReturned.idTopic()));
+    }
+
+    @Test
+    void shouldSaveTopicSuccessfully(){
+        TopicForm topicForm = TopicForm.builder().title("Teste").build();
+        Topic topicToSave = Topic.builder().title("Teste").build();
+        Topic topicSaved = Topic.builder().idTopic(1L).title("Teste").build();
+        TopicDTO topicReturned = TopicDTO.builder().idTopic(1L).title("Teste").build();
+
+        Mockito.when(repository.save(topicToSave)).thenReturn(topicSaved);
+
+        Assertions.assertEquals(topicReturned, service.saveTopic(topicForm));
     }
 
 
