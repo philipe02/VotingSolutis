@@ -1,0 +1,10 @@
+services:
+  sonar:
+    image: "sonarqube"
+    ports:
+      - "9000:9000"
+  rabbitmq:
+    image: "rabbitmq"
+    ports:
+      - "5672:5672"
+      - "15672:15672"

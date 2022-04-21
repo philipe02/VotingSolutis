@@ -18,7 +18,7 @@ public class TopicController {
     @Autowired
     TopicService service;
 
-    @Operation(summary = "Return topic of specified id")
+    @Operation(summary = "Return topic of the specified id")
     @GetMapping("/v1/{id}")
     public ResponseEntity<TopicDTO> getTopicById(@PathVariable("id") Long id){
         return new ResponseEntity<>(service.getTopicById(id), HttpStatus.OK) ;

@@ -1,6 +1,5 @@
 package com.java.voting.model.entity;
 
-import com.java.voting.model.entity.Voting;
 import lombok.*;
 
 import javax.persistence.*;

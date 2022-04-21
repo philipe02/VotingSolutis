@@ -18,13 +18,13 @@ public class VotingController {
     @Autowired
     VotingService service;
 
-    @Operation(summary = "Return Voting section of specified id")
+    @Operation(summary = "Return Voting section of the specified id")
     @GetMapping("/v1/{id}")
     public ResponseEntity<VotingDTO> getVotingById(@PathVariable("id") Long idVoting){
         return new ResponseEntity<>(service.getVotingById(idVoting), HttpStatus.OK);
     }
 
-    @Operation(summary = "Create Voting section of specified topic")
+    @Operation(summary = "Create Voting section of the specified topic")
     @PostMapping("/v1/{topicId}")
     public ResponseEntity<VotingDTO> createVoting(@PathVariable("topicId") Long idTopic){
         return new ResponseEntity<>(service.createVoting(idTopic), HttpStatus.CREATED);

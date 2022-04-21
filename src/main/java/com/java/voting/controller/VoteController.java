@@ -26,7 +26,7 @@ public class VoteController {
         return new ResponseEntity<>(service.getAllVotes(), HttpStatus.OK);
     }
 
-    @Operation(summary = "Register a vote from an associate to the informed voting section")
+    @Operation(summary = "Register a vote from an associate to the informed voting")
     @PostMapping("/v1")
     public ResponseEntity<VoteDTO> saveVote(@RequestBody VoteForm vote){
         return new ResponseEntity<>(service.saveVote(vote), HttpStatus.CREATED);
