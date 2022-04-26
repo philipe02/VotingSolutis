@@ -2,7 +2,7 @@
 
 Aplicação de votação feita como projeto final do curso de Java Spring Boot da [Solutis](https://solutis.com.br)
 
-##Sumário
+## Sumário
 
 * [Tecnologias utilizadas](#tecnologias-utilizadas)
 * [Pré-requisitos](#pré-requisitos)
