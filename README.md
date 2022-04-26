@@ -115,7 +115,7 @@ Necessário fazer o cadastro do sistema no sonar
 mvn clean verify sonar:sonar -D sonar.projectKey={Nome do Projeto} -D sonar.login={Token gerado} -D sonar.host.url=http://localhost:9000 
 ```
 
-##Tarefas bônus
+## Tarefas bônus
 
 * Tarefa Bônus 1 — Integração com sistemas externos ✅
 * Tarefa Bônus 2 — Contabilização automática ✅
