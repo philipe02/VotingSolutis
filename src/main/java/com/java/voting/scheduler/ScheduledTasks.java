@@ -36,7 +36,7 @@ public class ScheduledTasks {
                     .map(this::collectAndSaveResultsFromVoting)
                     .forEach(votingResults -> {
                         votingRepository.closeVoting(votingResults.getVoting().getIdVoting());
-                        messageSender.send("Voting for " + votingResults.getVoting().getTopic().getTitle() + " collected");
+                        messageSender.send("Voting for " + votingResults.getVoting().getTopic().getTitle() + " collected. Result: " + votingResults.getResult());
                     });
         }
 
